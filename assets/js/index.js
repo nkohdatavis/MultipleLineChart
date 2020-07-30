@@ -11,10 +11,12 @@
 //   nest,
 //   schemeCategory10,
 //   scaleOrdinal
+//   descending
 // } from "https://unpkg.com/d3@5.7.0/dist/d3.min.js"; 
 
 // import { dropdownMenu } from './dropdownMenu.js';
 // import { scatterPlot } from './scatterPlot.js';
+import { colorLegend } from './colorLegend.js';
 
 const svg = d3.select('svg');
 
@@ -23,7 +25,7 @@ const height = +svg.attr('height');
 
 //accessor functions
 const render = data => {
-  const title = 'Multi Line Chart ';
+  const title = 'A Week of Temperature Around the World';
 
   const xValue = d => d.timestamp;
   const xAxisLabel = 'Time';
@@ -35,7 +37,7 @@ const render = data => {
   const colorValue = d => d.city;
 
 
-  const margin = { top: 60, right: 40, bottom: 88, left: 105 };
+  const margin = { top: 60, right: 160, bottom: 88, left: 105 };
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
@@ -99,14 +101,29 @@ const render = data => {
     .curve(d3.curveBasis);
 
   // console.log(data);
+  //  y value of the last entry in array
+  const lastYValue = d =>
+    yValue(d.values[d.values.length - 1]);
+
 
   //single line for each city
   // split array into multiple arrays
   const nested = d3.nest()
     .key(colorValue)
-    .entries(data);
+    .entries(data)
+    .sort((a, b) =>
+      d3.descending(lastYValue(a), lastYValue(b))
+    );
 
   // console.log(nested);
+
+  //isolated the last point in time index 168
+
+
+
+
+
+
   colorScale.domain(nested.map(d => d.key));
 
 
@@ -133,6 +150,15 @@ const render = data => {
     .attr('class', 'title')
     .attr('y', -10)
     .text(title);
+
+  svg.append('g')
+    .attr('transform', `translate(790,121)`)
+    .call(colorLegend, {
+      colorScale,
+      circleRadius: 13,
+      spacing: 30,
+      textOffset: 14
+    });
 };
 
 //Data Table

@@ -108,7 +108,7 @@ const render = data => {
 };
 
 //Data Table
-d3.csv('https://vizhub.com/curran/datasets/temperature-in-san-francisco.csv')
+d3.csv('https://vizhub.com/curran/datasets/data-canvas-sense-your-city-one-week.csv')
   .then ( data => {
     data.forEach(d => {
       d.temperature = +d.temperature;

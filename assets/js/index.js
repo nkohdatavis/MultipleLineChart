@@ -8,7 +8,9 @@
 //   axisBottom,
 //   line,
 //   curveBasis,
-//   nest
+//   nest,
+//   schemeCategory10,
+//   scaleOrdinal
 // } from "https://unpkg.com/d3@5.7.0/dist/d3.min.js"; 
 
 // import { dropdownMenu } from './dropdownMenu.js';
@@ -30,6 +32,9 @@ const render = data => {
   const yAxisLabel = 'Temperature';
   const circleRadius = 6;
 
+  const colorValue = d => d.city;
+
+
   const margin = { top: 60, right: 40, bottom: 88, left: 105 };
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
@@ -46,6 +51,8 @@ const render = data => {
     .domain(d3.extent(data, yValue))
     .range([innerHeight, 0])
     .nice();
+
+  const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
   // console.log(yScale.domain());
   // console.log(yScale.range());
@@ -96,10 +103,12 @@ const render = data => {
   //single line for each city
   // split array into multiple arrays
   const nested = d3.nest()
-    .key(d => d.city)
+    .key(colorValue)
     .entries(data);
 
-  console.log(nested);
+  // console.log(nested);
+  colorScale.domain(nested.map(d => d.key));
+
 
   //multiple path elements using data join
   g.selectAll('.line-path').data(nested)
@@ -107,7 +116,8 @@ const render = data => {
     .attr('class', 'line-path')
     //d has key and values
     .attr('d', d => lineGenerator(d.values))
-
+    //key is the city name
+    .attr('stroke', d => colorScale(d.key));
   // g.append('path')
   //   .attr('class', 'line-path')
   //   .attr('d', lineGenerator(data));
